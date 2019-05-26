@@ -1,5 +1,7 @@
 import numpy as np
 
+# This function generates a matrix from the given JSON file.
+# Missing values are random generated and placed into the matrix.
 def generateMatrixFromJson(json):
     currentLayer = json
     weightMatrix = np.zeros((currentLayer['size_out'], currentLayer['size_in']))
@@ -15,6 +17,9 @@ def generateMatrixFromJson(json):
             weightMatrix[i - 1][int(node) - 1] = weights[node][str(i)] 
     return weightMatrix
 
+# This function does matrix-vector multiplication.
+# It takes the first row of the matrix and multiplicates all the values in that row with the first value in the vector,
+# this process is the same for every row.
 def calculateOutput(inputVector, weights, outputSize):
     output = np.zeros((outputSize, 1))
     for i in range(0, len(weights)):
