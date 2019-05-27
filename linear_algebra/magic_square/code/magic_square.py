@@ -1,21 +1,30 @@
 import numpy as np
 
+# Works with 3x3 and 4x4
+# Insert np array at variable ms
 ms = np.array([
-                [5  ,'x2','x3'],
-                ['x4','x5',  4],
-                ['x7','x8',  6]
+                [13 ,'x2','x3', 12],
+                [2  ,'x6','x7',  7],
+                ['x9','x10', 4,'x12'],
+                ['x13','x14',15,1]
             ])
-chars = ['x2','x3','x4','x5','x7','x8']
+
+# Append all unknown in one list
+chars = []
+for row in ms:
+    for element in row:
+        if 'x' in element:
+            chars.append(element)
 
 def generateMagicSquare(ms, chars):
     n = len(ms)
     MAGIC_CONSTANT = n*((n**2+1)/2)
 
     rowSums = []
-    lstV = []
+    charPositions = []
 
     # This function appends the sum of a full row / column (horizontal/vertical)
-    def getSumOfLine(matrix, vertical = False):  
+    def appendSumOfLine(matrix, vertical = False):  
         matrix = np.transpose(matrix) if vertical else matrix
 
         for i in range(len(matrix)):
@@ -26,44 +35,45 @@ def generateMagicSquare(ms, chars):
             rowSums.append(count)
 
     # This function appends the sum of diagonal line.
-    def diagonal(matrix):  
+    def appendDiagonalSum(matrix):  
         top = MAGIC_CONSTANT
         for i in range(len(matrix)):
             top -= int(matrix[i][i]) if not matrix[i][i] in chars else 0
         rowSums.append(top)
         rowSums.append(0)
 
-    def getCharPos(matrix, vertical = False):  # to calculate the position of the letters in the vertical and horizontal lines
+    # This function generates the position of the characters in the horizontal and vertical axis.
+    def appendCharPos(matrix, vertical = False):  
         matrix = np.transpose(matrix) if vertical else matrix
 
         for i in range(len(matrix)):
-            temp = [0, 0, 0, 0, 0, 0]
+            temp = [0] * len(chars)
             for j in range(len(matrix[i])):
                 if matrix[i][j] in chars:
                     index = chars.index(matrix[i][j])
                     temp[index] = 1
-            lstV.append(temp)
+            charPositions.append(temp)
 
 
-    # This function calculates the position of the characters in the diagonal line from top-left to bottom-right.
-    def getDiagonalCharPos(matrix):
+    # This function generates the position of the characters in the diagonal line from top-left to bottom-right.
+    def appendDiagonalCharPos(matrix):
         for i in range(len(matrix)):
-            temp = [0, 0, 0, 0, 0, 0]
+            temp = [0] * len(chars)
             if matrix[i][i] in chars:
                 index = chars.index(matrix[i][i])
                 temp[index] = 1
-                lstV.append(temp)
-        lstV.append(temp)
+                charPositions.append(temp)
+        charPositions.append(temp)
 
 
-    getSumOfLine(ms)
-    getSumOfLine(ms, vertical=True)
-    diagonal(ms)
-    getCharPos(ms)
-    getCharPos(ms, vertical=True)
-    getDiagonalCharPos(ms)
+    appendSumOfLine(ms)
+    appendSumOfLine(ms, vertical=True)
+    appendDiagonalSum(ms)
+    appendCharPos(ms)
+    appendCharPos(ms, vertical=True)
+    appendDiagonalCharPos(ms)
 
-    unknownVars = np.linalg.pinv(np.array(lstV)).dot(np.array(rowSums))
+    unknownVars = np.linalg.pinv(np.array(charPositions)).dot(np.array(rowSums))
 
     count = 0
     for row in range(len(ms)):
@@ -71,6 +81,7 @@ def generateMagicSquare(ms, chars):
             if(not ms[row][column].isdigit()):
                 ms[row][column] = unknownVars[count]
                 count+=1
+
     return ms.astype(np.float)
 
 print("Magic Square:")
