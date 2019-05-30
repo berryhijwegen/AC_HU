@@ -24,7 +24,7 @@ def generateMagicSquare(matrix, chars):
     charPositions = []
 
     # This function appends the sum of a full row / column (horizontal/vertical)
-    def appendSumOfLine(matrix, vertical = False):  
+    def appendSumOfLine(matrix, vertical):  
         matrix = np.transpose(matrix) if vertical else matrix
 
         for i in range(len(matrix)):
@@ -44,7 +44,7 @@ def generateMagicSquare(matrix, chars):
 
     # This function generates the position of the characters in the horizontal and vertical axis,
     # appends them after.
-    def appendCharPos(matrix, vertical = False):  
+    def appendCharPos(matrix, vertical):  
         matrix = np.transpose(matrix) if vertical else matrix
 
         for i in range(len(matrix)):
@@ -68,11 +68,11 @@ def generateMagicSquare(matrix, chars):
         charPositions.append(temp)
 
 
-    appendSumOfLine(matrix)
-    appendSumOfLine(matrix, vertical=True)
+    appendSumOfLine(matrix, False)
+    appendSumOfLine(matrix, True)
     appendDiagonalSum(matrix)
-    appendCharPos(matrix)
-    appendCharPos(matrix, vertical=True)
+    appendCharPos(matrix, False)
+    appendCharPos(matrix, True)
     appendDiagonalCharPos(matrix)
 
     unknownVars = np.linalg.pinv(np.array(charPositions)).dot(np.array(rowSums))
