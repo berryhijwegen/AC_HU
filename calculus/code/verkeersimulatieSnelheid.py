@@ -1,60 +1,49 @@
-import functions
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 
-directions = functions.getDirections('resources/verkeerssimulatie-richting.csv')
+timestamps      = []
+speedDataCar1   = []
+speedDataCar2   = []
 
-carPositions    = {
-        1: [0,0],
-        2: [0,0],
-        3: [0,0]
-    }
-currentSpeed    = [0.0,0.0,0.0]
-carColor        = ['red','blue','green']
-plt.axhline(0, color='black', linewidth=25, zorder=1)
-plt.axvline(0, color='black', linewidth=25, zorder=1)
+times, positionsCar1, positionsCar2 = np.loadtxt('resources/verkeerssimulatie-rechteweg-posities.csv', unpack=True, delimiter=';')
+previous_row = None
+maxSpeedCar1 = minSpeedCar1 = maxSpeedCar2 = minSpeedCar2 = 0
+for i in range(len(times)):
+    timestamp           = float(times[i])
+    posCar1             = float(positionsCar1[i])
+    posCar2             = float(positionsCar2[i])
+    
+    prevTimestamp       = float(times[i - 1]) if i != 0 else timestamp
+    prevPosCar1         = float(positionsCar1[i- 1]) if i != 0 else posCar1
+    prevPosCar2         = float(positionsCar2[i- 1]) if i != 0 else posCar2
+    
+    elapsedTime         = round(timestamp - prevTimestamp,1)
+    traveledDistance1   = posCar1 - prevPosCar1
+    traveledDistance2   = posCar2 - prevPosCar2
+    
+    currSpeedCar1KM     = traveledDistance1 / elapsedTime if elapsedTime != 0 else 0
+    currSpeedCar2KM     = traveledDistance2 / elapsedTime if elapsedTime != 0 else 0
 
-with open('resources/verkeerssimulatie-rechteweg-snelheden.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=';')
-    line_count = 0
-    prevRow = None
+    
+    speedDataCar1.append(currSpeedCar1KM * 36)
+    speedDataCar2.append(currSpeedCar2KM * 36)
+    timestamps.append(timestamp)
 
-    for row in csv_reader:
-        # Get positions from first row
-        if(line_count == 0):
-            
-            positions = row[1:]
-            for i in range(len(positions)):
-                carPositions[i + 1] = [0, int(positions[i])] if directions[i + 1] == 'v' else [int(positions[i]), 0]
+    maxSpeedCar1 = currSpeedCar1KM if currSpeedCar1KM > maxSpeedCar1 or i == 0 else maxSpeedCar1
+    minSpeedCar1 = currSpeedCar1KM if currSpeedCar1KM < minSpeedCar1 or i == 0 else minSpeedCar1
 
-        # For all other rows (speeds)        
-        else:
-            timestamp = row[0]
+    maxSpeedCar2 = currSpeedCar2KM if currSpeedCar2KM > maxSpeedCar2 or i == 0 else maxSpeedCar2
+    minSpeedCar2 = currSpeedCar2KM if currSpeedCar2KM < minSpeedCar2 or i == 0 else minSpeedCar2
 
-            # For each car get the direction and get new position,
-            # calculated by position = old position + speed * Δtime (Constant 0.1)
-            for i in range(len(row[1:])):
+print(f'minSpeed car 1: {minSpeedCar1 * 36} km/h')
+print(f'minSpeed car 1: {minSpeedCar2 * 36} km/h')
+print(f'maxSpeed car 2: {maxSpeedCar1 * 36} km/h')
+print(f'maxSpeed car 2: {maxSpeedCar2 * 36} km/h')
 
-                currentSpeed[i] = float(row[i+1])
-                index = 1 if directions[i + 1] == 'v' else 0
-                carPositions[i + 1][index] += currentSpeed[i] * 0.1
 
-                plt.scatter(carPositions[i + 1][0],carPositions[i + 1][1], color=carColor[i], s=15, zorder=10) 
-                plt.pause(0.1)
-
-            # Check if 2 cars bumped in to each other
-            for carPos1 in carPositions:
-
-                # Get length of car in right direction    
-                distanceCoordinates1 = [2,1.5] if directions[carPos1]  == 'h' else [1.5,2]
-                for carPos2 in carPositions:
-
-                    if(abs(carPositions[carPos1][0]-carPositions[carPos2][0]) < distanceCoordinates1[0]
-                            and abs(carPositions[carPos1][1]-carPositions[carPos2][1]) < distanceCoordinates1[0]
-                            and carPos1 != carPos2):
-                        print(f"{timestamp}s: Car {carPos1} bumped into car {carPos2}!\n{carPositions}\n")
-
-        line_count+=1
-        
+plt.plot(timestamps, speedDataCar1)
+plt.plot(timestamps, speedDataCar2)
+plt.xlabel('Time in seconds')
+plt.ylabel('Speed in km/h')
 plt.show()
-            
