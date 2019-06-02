@@ -40,10 +40,10 @@ def modus(lst):
 def median(lst):
     l = length(lst)
     if l % 2 == 0:
-        total = (lst[int((l + 1) / 2 - 1.5)]) + (lst[int((l + 1) / 2 - 0.5)])
+        total = (lst[int((l) / 2 - 0.5)]) + (lst[int((l) / 2 + 0.5)])
         return total / 2
     elif l % 2 == 1:
-        return lst[int((l+1)/2)]
+        return lst[int((l)/2)]
 
 
 def standardDeviation(lst):
