@@ -1,4 +1,4 @@
-import csv, functions, matplotlib.pyplot as plt, numpy as np, re
+import csv, functions, matplotlib.pyplot as plt, numpy as np, re, copy
 
 # Read data into variable data and note columns with non-floats in it.
 with open('resources/utrecht.csv') as csv_file:
@@ -46,26 +46,27 @@ while(True):
                 header = key
 
         # Sort and show all data, functions in external file 'functions.py'
+        dataset = copy.copy(data[index])
+        print(dataset)
         sortedData = functions.sort(data[index])
-
         print(header)
-        print(f"Average:            \n{functions.average(sortedData)}")
-        _modus = functions.modus(sortedData)
+        print(f"Average:            \n{functions.average(dataset)}")
+        _modus = functions.modus(dataset)
         print(f"Modus:              \n{_modus[0]}: {_modus[1]} time(s)")
         print(f"Median:             \n{functions.median(sortedData)}")
-        print(f"Standard deviaton:  \n{functions.standardDeviation(sortedData)}")
+        print(f"Standard deviaton:  \n{functions.standardDeviation(dataset)}")
 
         # Show histogram with confindence interval
         fig, ax = plt.subplots()
 
-        binwidth = (max(data[index]) - min(data[index])) / 40
+        binwidth = (max(dataset) - min(dataset)) / 40
         
-        plt.hist(data[index], bins=np.arange(min(data[index]), max(data[index]) + binwidth, binwidth))
+        plt.hist(dataset, bins=np.arange(min(dataset), max(dataset) + binwidth, binwidth))
         
-        avg = functions.average(data[index])
+        avg = functions.average(dataset)
         plt.axvline(x=avg, color='red')
 
-        for value in functions.confidenceInterval(data[index]):
+        for value in functions.confidenceInterval(dataset):
             plt.axvline(x=value, color='green', linestyle=':')
 
         plt.ylabel('Count')
@@ -74,7 +75,7 @@ while(True):
         plt.show()
 
         # Show graph with all data and trend line
-        x, y, b = functions.linearRegression(data[index])
+        x, y, b = functions.linearRegression(dataset)
         fig, ax = plt.subplots()
         # plot points
         plt.scatter(x, y, color = "m",marker = "o", s = 10) 
