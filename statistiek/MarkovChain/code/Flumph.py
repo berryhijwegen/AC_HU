@@ -12,8 +12,7 @@ class Flumph:
         currVector = self.startChances
         data = {}
         for i in range(len(self.states)):
-            data[i] = []
-        
+            data[i] = [currVector[i]]
         count = 0
         while(True):
             prevcV = currVector
