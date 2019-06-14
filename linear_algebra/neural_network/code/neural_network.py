@@ -1,5 +1,5 @@
 import sys, json, numpy as np
-from functions import calculateOutput, generateMatrixFromJson
+from functions import calculateOutput, generateMatrixFromJson, numeric
 
 # stop if argument is not given
 if len(sys.argv) < 2:
@@ -8,8 +8,9 @@ if len(sys.argv) < 2:
 # Load the file with the file name given in argument
 with open(sys.argv[1]) as json_file:  
     data = json.load(json_file)
-    
-    inputVector = np.ones(data['layer1']['size_in'])
+    data = numeric(data)
+
+    inputVector = np.ones((int(data['layer1']['size_in']), 1))
     layers = list(data.values())
     output = None
     for i in range(len(layers)):
@@ -20,6 +21,6 @@ with open(sys.argv[1]) as json_file:
         print(matrixLayer)
         print(functionInput)
         print()
-        output = calculateOutput(functionInput, matrixLayer, layers[i]['size_out'])
+        output = calculateOutput(functionInput, matrixLayer, int(layers[i]['size_out']))
     print("Output:")
     print(output)

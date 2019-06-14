@@ -12,8 +12,7 @@ def generateMatrixFromJson(json):
             try:
                 weights[node][str(i)]
             except KeyError:
-                randonNumber = round(np.random.uniform(-1.0,1.0), 1) 
-                weights[node][str(i)] = randonNumber
+                weights[node][str(i)] = 0
             weightMatrix[i - 1][int(node) - 1] = weights[node][str(i)] 
     return weightMatrix
 
@@ -21,8 +20,24 @@ def generateMatrixFromJson(json):
 # It takes the first row of the matrix and multiplicates all the values in that row with the first value in the vector,
 # this process is the same for every row.
 def calculateOutput(inputVector, weights, outputSize):
-    output = np.zeros((outputSize, 1))
-    for i in range(0, len(weights)):
-        for j in range(0, len(weights[i])):
-            output[i] += inputVector[j] * weights[i][j]
+    output = np.zeros((outputSize, np.size(inputVector, 1)))
+    for k in range(0, np.size(inputVector, 1)):
+        for i in range(0, len(weights)):
+            for j in range(0, len(weights[i])):
+                print(i,j,k)
+                output[i][k] += inputVector[j][k] * weights[i][j]
     return output
+
+def numeric(d):
+    for k, v in d.items():
+        if isinstance(v, dict):
+            numeric(v)
+        else:
+            try:
+                if(k != 'size_in' and k != 'size_out'):
+                    d[k] = float(v)
+                else:
+                    d[k] = int(v)
+            except:
+                pass
+    return d
